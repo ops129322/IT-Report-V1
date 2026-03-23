@@ -1,6 +1,6 @@
 // --- CẤU HÌNH HỆ THỐNG ---
 const ADMIN_LIST = [
-  'huythanh.pham@spxpress.com', // Email chính của bạn
+  'huythanh.pham@spxexpress.com', // Email chính của bạn
   'admin2@spxpress.com'         // Thêm các email admin khác vào đây
 ];
 
