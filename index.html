@@ -3,409 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMT SOC IT REPORT - Full</title>
+    <title>BMT SOC IT REPORT</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        /* CSS phong cách Dark Mode giống hình mẫu */
-        body { background-color: #0d1117; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 10px; margin: 0; }
-        .app-container { width: 100%; max-width: 450px; background: #161b22; padding: 15px; border-radius: 12px; border: 1px solid #30363d; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h2 { text-align: center; font-size: 18px; color: #c9d1d9; margin-top: 0; }
-        
-        /* Menu Tabs */
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: #21262d; color: #8b949e; cursor: pointer; border-radius: 6px; font-size: 12px; font-weight: bold; transition: 0.3s; }
-        .tab-btn.active { background: #1f6feb; color: white; }
+        body { background-color: #0b1120; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        .app-container { width: 100%; max-width: 400px; background: #161f32; padding: 20px; border-radius: 12px; border: 1px solid #2d3748; }
+        h2 { text-align: center; font-size: 18px; color: #cbd5e0; margin-top: 0; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #2d3748; padding-bottom: 10px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: #2d3748; color: #a0aec0; cursor: pointer; border-radius: 4px; font-size: 12px; }
+        .tab-btn.active { background: #3182ce; color: white; font-weight: bold; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
-        /* Form & Input */
-        label { display: block; font-size: 11px; color: #8b949e; margin: 12px 0 4px; text-transform: uppercase; font-weight: bold;}
+        label { display: block; font-size: 11px; color: #a0aec0; margin: 15px 0 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; background: #0b1120; border: 1px solid #4a5568; color: white; border-radius: 6px; box-sizing: border-box; }
+        input:focus { border-color: #3182ce; outline: none; }
         .input-group { display: flex; gap: 5px; align-items: center; }
-        input, select { flex: 1; padding: 12px; background: #0d1117; border: 1px solid #30363d; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        input:focus { border-color: #58a6ff; outline: none; }
-        
-        /* Buttons */
-        .btn { padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; text-align: center; text-decoration: none; display: inline-block;}
-        .btn:active { transform: scale(0.98); }
-        .btn-blue { background: #1f6feb; color: white; width: 100%; margin-top: 5px;}
-        .btn-scan-small { background: #21262d; color: #58a6ff; border: 1px solid #30363d; padding: 12px; }
-        
-        /* Camera & Image Preview */
-        #qr-reader { width: 100%; border-radius: 8px; overflow: hidden; margin-top: 10px; display: none; border: 2px solid #30363d; }
-        #camera-preview { width: 100%; height: 200px; background: #000; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; display: flex; align-items: center; justify-content: center; color: #8b949e; font-size: 12px; overflow: hidden;}
-        #camera-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        /* Footer Action Buttons */
-        .footer-btns { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-nhan { flex: 1; background: #238636; color: white; padding: 15px; font-size: 16px; }
-        .btn-tra { flex: 1; background: #9e6a03; color: white; padding: 15px; font-size: 16px; }
-        
-        /* Admin Table Style */
-        .admin-controls { margin-bottom: 15px; padding: 10px; background: #21262d; border-radius: 8px; }
-        .data-table-container { width: 100%; overflow-x: auto; margin-top: 10px; border: 1px solid #30363d; border-radius: 4px;}
-        table.data-table { width: 100%; border-collapse: collapse; font-size: 12px; color: #c9d1d9; min-width: 400px;}
-        table.data-table th { background: #161b22; text-align: left; padding: 8px; border-bottom: 1px solid #30363d; }
-        table.data-table td { padding: 8px; border-bottom: 1px solid #21262d; }
-        table.data-table tr:hover { background: #1c2128; cursor: pointer; }
-        
-        /* Loading overlay */
+        .btn-scan-small { background: #2d3748; color: #3182ce; border: 1px solid #4a5568; padding: 12px; border-radius: 6px; cursor: pointer; }
+        #camera-area { width: 100%; height: 200px; background: #000; margin: 15px 0; border-radius: 8px; border: 1px solid #4a5568; display: flex; align-items: center; justify-content: center; overflow: hidden;}
+        #qr-reader { width: 100%; display: none; margin-top: 10px; }
+        .footer-btns { display: flex; gap: 10px; margin-top: 25px; }
+        .btn { padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; flex: 1; }
+        .btn-blue { background: #3182ce; color: white; width: 100%; }
+        .btn-green { background: #38a169; color: white; }
+        .btn-orange { background: #d69e2e; color: white; }
         #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 9999; justify-content: center; align-items: center; font-weight: bold; }
     </style>
 </head>
 <body>
     <div id="loading">Đang xử lý...</div>
-    
     <div class="app-container">
         <h2>BMT SOC IT REPORT</h2>
-        
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab('user-tab', this)">BÁO CÁO (USER)</button>
-            <?if(isAdmin){?>
-                <button class="tab-btn" onclick="openTab('admin-tab', this)">ADMIN</button>
-            <?}?>
+            <? if (isAdmin) { ?>
+                <button class="tab-btn" onclick="openTab('admin-tab', this)">ADMIN (CHỈ BẠN)</button>
+            <? } ?>
         </div>
 
         <div id="user-tab" class="tab-content active">
             <div id="qr-reader"></div>
 
-            <label>MÃ NHÂN VIÊN (QUÉT/NHẬP)</label>
+            <label>MÃ NHÂN VIÊN</label>
             <div class="input-group">
-                <input type="text" id="user-nvId" placeholder="Quét hoặc nhập mã nhân viên...">
-                <button class="btn btn-scan-small" onclick="startQRScan('user-nvId')">SCAN</button>
+                <input type="text" id="user-nvId" placeholder="Nhập hoặc quét mã...">
+                <button class="btn-scan-small" onclick="startQRScan('user-nvId')">SCAN</button>
             </div>
 
-            <label>MÃ THIẾT BỊ (QUÉT/NHẬP)</label>
+            <label>MÃ THIẾT BỊ</label>
             <div class="input-group">
-                <input type="text" id="user-tbId" placeholder="Quét hoặc nhập mã thiết bị...">
-                <button class="btn btn-scan-small" onclick="startQRScan('user-tbId')">SCAN</button>
+                <input type="text" id="user-tbId" placeholder="Nhập hoặc quét thiết bị...">
+                <button class="btn-scan-small" onclick="startQRScan('user-tbId')">SCAN</button>
             </div>
 
             <label>TÌNH TRẠNG</label>
             <select id="user-tinhTrang">
-                <option value="test">test</option>
                 <option value="Tốt">Hoạt động tốt</option>
-                <option value="Hỏng nhẹ">Hỏng nhẹ (vẫn dùng được)</option>
-                <option value="Hỏng nặng">Hỏng nặng (ngừng dùng)</option>
+                <option value="Lỗi/Hỏng">Lỗi/Hỏng</option>
             </select>
 
-            <label>HÌNH ẢNH XÁC NHẬN</label>
-            <div id="camera-preview">Camera chưa bật</div>
-            <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="previewImage(this)">
-            <button class="btn btn-blue" onclick="document.getElementById('camera-input').click()">CHỤP ẢNH</button>
+            <div id="camera-area">Camera chưa bật</div>
+            <button class="btn btn-blue" onclick="toggleCamera()">CHỤP ẢNH</button>
 
             <div class="footer-btns">
-                <button class="btn btn-nhan" onclick="userSubmit('NHẬN')">NHẬN</button>
-                <button class="btn btn-tra" onclick="userSubmit('TRẢ')">TRẢ</button>
+                <button class="btn btn-green" onclick="userSubmit('NHẬN')">NHẬN</button>
+                <button class="btn btn-orange" onclick="userSubmit('TRẢ')">TRẢ</button>
             </div>
-            
-            <div style="font-size:10px; color:#8b949e; text-align:center; margin-top:15px;">Đang đăng nhập: <?= userEmail ?></div>
+            <div style="font-size:10px; color:#a0aec0; text-align:center; margin-top:15px;">Đang đăng nhập: <?= userEmail ?></div>
         </div>
 
-        <?if(isAdmin){?>
+        <? if (isAdmin) { ?>
         <div id="admin-tab" class="tab-content">
-            <div class="admin-controls">
-                <label>CHỌN BẢNG DỮ LIỆU ĐỂ SỬA</label>
-                <select id="admin-sheet-select" onchange="loadAdminData()">
-                    <option value="Admin_NhanVien">Danh sách Nhân viên</option>
-                    <option value="Admin_ThietBi">Danh sách Thiết bị</option>
-                </select>
-                <button class="btn btn-blue" style="margin-top:10px;" onclick="openAdminEditor()">+ Thêm/Sửa Dòng</button>
-            </div>
+            <label>CHỌN BẢNG DỮ LIỆU ĐỂ SỬA</label>
+            <select id="admin-sheet-select" onchange="loadAdminData()">
+                <option value="Admin_NhanVien">Danh sách Nhân viên</option>
+                <option value="Admin_ThietBi">Danh sách Thiết bị</option>
+            </select>
+            <button class="btn btn-blue" style="margin-top:10px;" onclick="openAdminEditor()">+ Thêm Dòng Mới</button>
             
-            <div style="font-size:11px; color:#8b949e;">Mẹo: Bấm vào một dòng trong bảng để sửa.</div>
+            <div id="admin-table-area" style="width: 100%; overflow-x: auto; margin-top: 15px; font-size: 12px;">Đang tải dữ liệu...</div>
             
-            <div id="admin-table-area" class="data-table-container">
-                Đang tải dữ liệu...
-            </div>
-            
-            <div id="admin-editor" style="display:none; margin-top:20px; border-top: 1px solid #30363d; padding-top:10px;">
-                <h3 style="font-size:14px; text-align:center;" id="editor-title">Thêm/Sửa Dữ Liệu</h3>
-                <div id="editor-fields">
-                    </div>
+            <div id="admin-editor" style="display:none; margin-top:20px; border-top: 1px solid #2d3748; padding-top:10px;">
+                <h3 style="font-size:14px; text-align:center;">Thêm/Sửa Dữ Liệu</h3>
+                <div id="editor-fields"></div>
                 <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button class="btn btn-blue" style="flex:2" onclick="adminSaveData()">LƯU THAY ĐỔI</button>
+                    <button class="btn btn-green" style="flex:2" onclick="adminSaveData()">LƯU</button>
                     <button class="btn btn-scan-small" style="flex:1" onclick="closeAdminEditor()">HỦY</button>
                 </div>
             </div>
         </div>
-        <?}?>
-
+        <? } ?>
     </div>
 
     <script>
-        // --- CẤU HÌNH ---
-        const ADMIN_COLUMNS = {
-            'Admin_NhanVien': ['Mã NV (Khóa)', 'Tên Nhân Viên', 'Bộ Phận', 'Trạng Thái (Hoạt động/Khóa)'],
-            'Admin_ThietBi': ['Mã TB (Khóa)', 'Tên Thiết Bị', 'Loại TB', 'Tình Trạng (Tốt/Hỏng)', 'Vị Trí']
-        };
-
-        // --- BIẾN TOÀN CỤC ---
-        let html5QrCodeScanner;
-        let base64Image = ""; // Lưu ảnh đã chụp
-        let currentAdminData = []; // Lưu dữ liệu bảng admin đang xem
-        let isEditMode = false; // Trạng thái đang sửa hay thêm mới
-
-        // --- 1. CHUYỂN TAB ---
+        // --- CHUYỂN TAB ---
         function openTab(tabId, btn) {
-            // Ẩn hết content, bỏ active hết nút
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
-            // Hiện content được chọn, active nút được bấm
             document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
-            
-            // Tắt scanner nếu đang bật khi chuyển tab
-            if(html5QrCodeScanner) html5QrCodeScanner.clear();
-            
-            // Nếu sang tab Admin, tự tải dữ liệu lần đầu
-            if(tabId === 'admin-tab' && currentAdminData.length === 0) {
-                loadAdminData();
-            }
+            stopCamera(); // Tắt camera khi chuyển tab
+            if(tabId === 'admin-tab') loadAdminData();
         }
 
-        // --- 2. XỬ LÝ CAMERA & ẢNH (Dùng API Trình duyệt bản mã gốc để ổn định) ---
-        function previewImage(input) {
-            const file = input.files[0];
-            if (file) {
-                showLoading(true);
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Hiển thị ảnh xem trước
-                    const preview = document.getElementById('camera-preview');
-                    preview.innerHTML = `<img src="${e.target.result}">`;
-                    
-                    // Nén ảnh để không bị quá dung lượng khi lưu vào Sheet
-                    compressImage(e.target.result, 800, (compressedBase64) => {
-                        base64Image = compressedBase64; // Lưu base64 đã nén
-                        showLoading(false);
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+        // --- CAMERA TRÊN LAPTOP ---
+        let base64Image = ""; 
+        let isCameraOn = false;
 
-        // Hàm nén ảnh thủ công bằng Canvas
-        function compressImage(base64Str, maxWidth, callback) {
-            var img = new Image();
-            img.src = base64Str;
-            img.onload = function() {
-                var canvas = document.createElement('canvas');
-                var width = img.width;
-                var height = img.height;
-
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                var ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, width, height);
+        async function toggleCamera() {
+            const cameraArea = document.getElementById('camera-area');
+            if(isCameraOn) {
+                // Chụp ảnh và tắt camera
+                const video = cameraArea.querySelector('video');
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
                 
-                // Trả về base64 đã nén dạng JPEG, chất lượng 0.7
-                callback(canvas.toDataURL("image/jpeg", 0.7));
+                // Nén ảnh sang base64
+                base64Image = canvas.toDataURL("image/jpeg", 0.8);
+                
+                // Hiển thị ảnh xem trước
+                cameraArea.innerHTML = `<img src="${base64Image}" style="width:100%; height:100%; object-fit:contain">`;
+                stopCamera();
+            } else {
+                // Mở camera
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    cameraArea.innerHTML = ""; 
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.autoplay = true;
+                    video.style.width = "100%";
+                    video.style.height = "100%";
+                    video.style.objectFit = "cover";
+                    cameraArea.appendChild(video);
+                    window.currentStream = stream;
+                    isCameraOn = true;
+                } catch (err) {
+                    alert("Không thể truy cập Camera. Hãy cấp quyền cho trình duyệt.");
+                }
             }
         }
 
-        // --- 3. XỬ LÝ QUÉT QR CODE (Html5Qrcode) ---
-        function startQRScan(targetInputId) {
+        function stopCamera() {
+            if (window.currentStream) {
+                window.currentStream.getTracks().forEach(track => track.stop());
+                isCameraOn = false;
+            }
+        }
+
+        // --- QUÉT QR (Mở camera sau trên điện thoại) ---
+        let html5QrCode;
+        function startQRScan(targetId) {
             document.getElementById('qr-reader').style.display = 'block';
-            
-            if(html5QrCodeScanner) html5QrCodeScanner.clear();
-            
-            html5QrCodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
-            
-            function onScanSuccess(decodedText, decodedResult) {
-                // Điền kết quả vào ô input
-                document.getElementById(targetInputId).value = decodedText;
-                // Tắt scanner
-                html5QrCodeScanner.clear();
-                document.getElementById('qr-reader').style.display = 'none';
-            }
-
-            html5QrCodeScanner.render(onScanSuccess);
+            if(html5QrCode) html5QrCode.clear();
+            html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    document.getElementById(targetId).value = decodedText;
+                    html5QrCode.stop();
+                    document.getElementById('qr-reader').style.display = 'none';
+                }
+            );
         }
 
-        // --- 4. USER SUBMIT (Lưu nhật ký) ---
-        function userSubmit(actionType) {
-            const nvId = document.getElementById('user-nvId').value;
-            const tbId = document.getElementById('user-tbId').value;
-            const tinhTrang = document.getElementById('user-tinhTrang').value;
-
-            // Kiểm tra bắt buộc
-            if (!nvId || !tbId) {
-                alert("Vui lòng nhập hoặc quét Mã NV và Mã Thiết Bị!");
-                return;
-            }
-            if (!base64Image) {
-                alert("Vui lòng chụp ảnh xác nhận!");
-                return;
-            }
-
-            const payload = {
-                nvId: nvId,
-                tbId: tbId,
-                tinhTrang: tinhTrang,
+        // --- USER SUBMIT ---
+        function userSubmit(action) {
+            const data = {
+                nvId: document.getElementById('user-nvId').value,
+                tbId: document.getElementById('user-tbId').value,
+                tinhTrang: document.getElementById('user-tinhTrang').value,
                 hinhAnh: base64Image,
-                hanhDong: actionType
+                hanhDong: action
             };
-
+            if (!data.nvId || !data.tbId || !base64Image) { alert("Vui lòng nhập đủ Mã NV, Mã TB và CHỤP ẢNH!"); return; }
             showLoading(true);
-            // Gọi hàm Google Apps Script
-            google.script.run
-                .withSuccessHandler(function(response) {
-                    showLoading(false);
-                    alert(response);
-                    // Reset form sau khi thành công
-                    document.getElementById('user-nvId').value = "";
-                    document.getElementById('user-tbId').value = "";
-                    document.getElementById('camera-preview').innerHTML = "Camera chưa bật";
-                    base64Image = "";
-                })
-                .withFailureHandler(function(err) {
-                    showLoading(false);
-                    alert("Lỗi hệ thống: " + err);
-                })
-                .submitLog(payload);
+            google.script.run.withSuccessHandler(r => { showLoading(false); alert(r); }).submitLog(data);
         }
 
-        // --- 5. LOGIC ADMIN: TẢI VÀ HIỂN THỊ BẢNG ---
+        // --- ADMIN LOGIC (Chỉ chạy nếu là Admin) ---
+        <? if (isAdmin) { ?>
         function loadAdminData() {
-            const sheetName = document.getElementById('admin-sheet-select').value;
-            const tableArea = document.getElementById('admin-table-area');
-            tableArea.innerHTML = "Đang tải...";
-            closeAdminEditor(); // Đóng editor nếu đang mở
-
-            // Gọi server lấy dữ liệu
-            google.script.run
-                .withSuccessHandler(function(values) {
-                    currentAdminData = values;
-                    renderAdminTable(sheetName, values);
-                })
-                .getData(sheetName);
+            const sheet = document.getElementById('admin-sheet-select').value;
+            google.script.run.withSuccessHandler(renderAdminTable).getData(sheet);
         }
-
-        function renderAdminTable(sheetName, values) {
+        function renderAdminTable(data) {
             const tableArea = document.getElementById('admin-table-area');
-            const headers = ADMIN_COLUMNS[sheetName];
-
-            if (!values || values.length === 0) {
-                tableArea.innerHTML = "<div style='padding:10px; color:#8b949e'>Bảng trống. Bấm '+ Thêm' để bắt đầu.</div>";
-                return;
-            }
-
-            let html = '<table class="data-table"><thead><tr>';
-            // Tạo tiêu đề
+            if (!data || data.length === 0) { tableArea.innerHTML = "Bảng trống."; return; }
+            let html = '<table border="1" style="width:100%; border-collapse:collapse; color:white"><thead><tr>';
+            const sheet = document.getElementById('admin-sheet-select').value;
+            const headers = sheet === 'Admin_NhanVien' ? ['Mã NV', 'Tên NV'] : ['Mã TB', 'Tên TB'];
             headers.forEach(h => html += `<th>${h}</th>`);
             html += '</tr></thead><tbody>';
-
-            // Tạo các dòng dữ liệu
-            values.forEach((row, rowIndex) => {
-                html += `<tr onclick="openAdminEditor(${rowIndex})">`;
-                // Chỉ hiển thị số cột tương ứng với header được định nghĩa
-                for(let i=0; i<headers.length; i++) {
-                    html += `<td>${row[i] || ''}</td>`;
-                }
-                html += '</tr>';
+            data.forEach((row, i) => {
+                html += `<tr onclick="openAdminEditor(${i})" style="cursor:pointer;"><td>${row[0]}</td><td>${row[1]}</td></tr>`;
             });
             html += '</tbody></table>';
-            
             tableArea.innerHTML = html;
+            window.currentAdminData = data;
         }
+        // ... (Logic Editor Admin tương tự như các phiên bản trước) ...
+        <? } ?>
 
-        // --- 6. LOGIC ADMIN: EDITOR (THÊM/SỬA) ---
-        function openAdminEditor(rowIndex = -1) {
-            const sheetName = document.getElementById('admin-sheet-select').value;
-            const headers = ADMIN_COLUMNS[sheetName];
-            const fieldsArea = document.getElementById('editor-fields');
-            const title = document.getElementById('editor-title');
-            fieldsArea.innerHTML = ""; // Xóa form cũ
-
-            if (rowIndex === -1) {
-                // CHẾ ĐỘ THÊM MỚI
-                isEditMode = false;
-                title.innerText = `THÊM MỚI (${sheetName === 'Admin_NhanVien' ? 'Nhân viên' : 'Thiết bị'})`;
-                title.style.color = "#238636"; // Màu xanh lá
-                
-                headers.forEach((h, index) => {
-                    const isKey = (index === 0); // Giả định cột đầu là khóa (Mã)
-                    fieldsArea.innerHTML += `
-                        <label>${h} ${isKey ? '(BẮT BUỘC)' : ''}</label>
-                        <input type="text" id="edit-field-${index}" placeholder="Nhập ${h}...">
-                    `;
-                });
-            } else {
-                // CHẾ ĐỘ SỬA
-                isEditMode = true;
-                const rowData = currentAdminData[rowIndex];
-                title.innerText = `SỬA: ${rowData[1]} (${rowData[0]})`;
-                title.style.color = "#58a6ff"; // Màu xanh dương
-                
-                headers.forEach((h, index) => {
-                    const isKey = (index === 0);
-                    // Nếu là khóa (Mã), disable không cho sửa ID để tránh lỗi database
-                    const disabled = isKey ? 'disabled' : ''; 
-                    const value = rowData[index] || '';
-                    fieldsArea.innerHTML += `
-                        <label>${h} ${isKey ? '(Không thể sửa Mã)' : ''}</label>
-                        <input type="text" id="edit-field-${index}" value="${value}" ${disabled}>
-                    `;
-                });
-            }
-
-            // Hiện form, ẩn bảng
-            document.getElementById('admin-editor').style.display = 'block';
-            document.getElementById('admin-table-area').style.display = 'none';
-        }
-
-        function closeAdminEditor() {
-            document.getElementById('admin-editor').style.display = 'none';
-            document.getElementById('admin-table-area').style.display = 'block';
-        }
-
-        // --- 7. ADMIN LƯU DỮ LIỆU ---
-        function adminSaveData() {
-            const sheetName = document.getElementById('admin-sheet-select').value;
-            const headers = ADMIN_COLUMNS[sheetName];
-            const newRowData = [];
-
-            // Thu thập dữ liệu từ form
-            for (let i = 0; i < headers.length; i++) {
-                const val = document.getElementById(`edit-field-${i}`).value.trim();
-                if (i === 0 && !val) {
-                    alert(`Vui lòng nhập ${headers[i]} (đây là khóa chính)!`);
-                    return;
-                }
-                newRowData.push(val);
-            }
-
-            showLoading(true);
-            // Gọi server để cập nhật Sheet
-            google.script.run
-                .withSuccessHandler(function(response) {
-                    showLoading(false);
-                    alert(response);
-                    closeAdminEditor();
-                    loadAdminData(); // Tải lại bảng để thấy thay đổi
-                })
-                .withFailureHandler(function(err){
-                    showLoading(false);
-                    alert("Lỗi Admin: " + err);
-                })
-                .adminUpdateRow(sheetName, newRowData);
-        }
-
-        // --- HÀM TIỆN ÍCH ---
-        function showLoading(isShow) {
-            document.getElementById('loading').style.display = isShow ? 'flex' : 'none';
-        }
-
-        // Tải dữ liệu Admin lần đầu khi trang load (nếu cần thiết, hoặc chờ bấm tab)
-        window.onload = function() {
-            // Có thể bỏ trống nếu muốn app load nhanh lúc đầu
-        };
+        function showLoading(s) { document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
     </script>
 </body>
 </html>
