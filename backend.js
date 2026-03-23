@@ -6,7 +6,7 @@
 // 1. CẤU HÌNH DANH SÁCH ADMIN
 // Chỉ những email này mới thấy được tab "Lịch sử" và "Admin"
 const ADMIN_LIST = [
-  'huythanh.pham@spxpress.com', // Email của bạn
+  'huythanh.pham@spxexpress.com', // Email của bạn
   'admin2@spxpress.com'         // Thêm các email admin khác tại đây
 ];
 
