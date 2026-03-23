@@ -1,210 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <base target="_top">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        :root { --bg: #0b1120; --card: #161f32; --text: #f8fafc; --primary: #3182ce; --success: #38a169; --danger: #e53e3e; --warning: #d69e2e; }
-        body { background-color: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .app-container { width: 100%; max-width: 480px; background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid #2d3748; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #1a263e; padding: 5px; border-radius: 10px; }
-        .tab-btn { flex: 1; padding: 12px 5px; border: none; background: transparent; color: #94a3b8; cursor: pointer; border-radius: 8px; font-size: 13px; font-weight: 600; transition: 0.3s; }
-        .tab-btn.active { background: var(--primary); color: white; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        label { display: block; font-size: 11px; color: #94a3b8; margin: 15px 0 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select { width: 100%; padding: 14px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2); }
-        #camera-area { width: 100%; height: 240px; background: #000; border-radius: 12px; border: 1px solid #334155; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 15px 0; position: relative; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.2s; active { transform: scale(0.98); } }
-        .btn-blue { background: var(--primary); color: white; }
-        .btn-green { background: var(--success); color: white; }
-        .btn-orange { background: var(--warning); color: white; }
-        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
-        .loader { border: 4px solid #2d3748; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; color: #94a3b8; font-size: 12px; padding: 10px; border-bottom: 1px solid #2d3748; }
-        td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid #1e293b; }
-    </style>
-</head>
-<body>
-    <div id="loading"><div class="loader"></div><span>Đang xử lý dữ liệu...</span></div>
-    
-    <div class="app-container">
-        <h2 style="text-align:center; font-size: 18px; margin-bottom: 20px; color: var(--primary);">BMT SOC IT - V3.0</h2>
-        
-        <div class="tabs">
-            <button class="tab-btn active" onclick="openTab('user-tab', this)">BÁO CÁO</button>
-            <? if (isAdmin) { ?>
-                <button class="tab-btn" onclick="openTab('history-tab', this)">LỊCH SỬ</button>
-                <button class="tab-btn" onclick="openTab('admin-tab', this)">ADMIN</button>
-            <? } ?>
-        </div>
+// THAY LINK WEB APP CỦA BẠN VÀO ĐÂY
+const API_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbyDZ4MMWygVMwf_yuhCor-K9_CIALWt4IJxPyDNfQupSxjHR2NB-4OgVHdpWH604O8o/exec"; //
 
-        <div id="user-tab" class="tab-content" style="display:block;">
-            <label>Mã Nhân Viên</label>
-            <input type="text" id="user-nvId" placeholder="Nhập mã nhân viên..." oninput="lookupEmployee()">
-            <div id="display-nv-name" style="font-size: 14px; font-weight: bold; margin: 8px 0; min-height: 20px;"></div>
+// Hàm gọi API chung cho GitHub
+async function callAPI(params, isPost = false) {
+    const options = isPost ? { method: 'POST', body: JSON.stringify(params) } : { method: 'GET' };
+    const url = isPost ? API_URL : API_URL + "?" + new URLSearchParams(params);
+    const res = await fetch(url);
+    return await res.json();
+}
 
-            <label>Mã Thiết Bị</label>
-            <input type="text" id="user-tbId" placeholder="Quét hoặc nhập mã thiết bị...">
+// Sửa lại hàm tra cứu tên trên GitHub
+async function lookupEmployee() {
+    const id = document.getElementById('user-nvId').value.trim();
+    if(id.length >= 3) {
+        const name = await callAPI({ action: 'getName', id: id });
+        currentEmployeeName = name;
+        document.getElementById('display-nv-name').innerText = "👤 " + name;
+    }
+}
 
-            <label>Tình Trạng</label>
-            <select id="user-tinhTrang"><option>Tốt</option><option>Lỗi/Hỏng</option><option>Cần sạc pin</option></select>
-
-            <div id="camera-area">Camera đang tắt</div>
-            <button class="btn btn-blue" onclick="toggleCamera()" style="margin-bottom: 15px;">📷 BẬT CAMERA / CHỤP ẢNH</button>
-            
-            <div style="display:flex; gap:12px;">
-                <button class="btn btn-green" onclick="userSubmit('NHẬN')">NHẬN MÁY</button>
-                <button class="btn btn-orange" onclick="userSubmit('TRẢ')">TRẢ MÁY</button>
-            </div>
-            <div style="text-align:center; margin-top:15px; font-size:10px; color:#4a5568;">User: <?= userEmail ?></div>
-        </div>
-
-        <? if (isAdmin) { ?>
-        <div id="history-tab" class="tab-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <label>Giao dịch gần nhất</label>
-                <button onclick="loadHistory()" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:12px;">🔄 Làm mới</button>
-            </div>
-            <div id="history-list" style="max-height: 450px; overflow-y: auto;">Đang tải...</div>
-        </div>
-
-        <div id="admin-tab" class="tab-content">
-            <label>Quản lý danh mục</label>
-            <select id="admin-sheet-select" onchange="loadAdminData()">
-                <option value="Admin_NhanVien">👥 Danh sách Nhân viên</option>
-                <option value="Admin_ThietBi">📦 Danh sách Thiết bị</option>
-            </select>
-            <button class="btn btn-blue" style="margin-top:10px; padding: 10px;" onclick="openAdminEditor(-1)">+ THÊM MỚI</button>
-            <div id="admin-table-area" style="margin-top:15px; max-height: 350px; overflow-y: auto; background:#0f172a; border-radius:8px;"></div>
-        </div>
-        <? } ?>
-    </div>
-
-    <div id="admin-editor" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:380px; background:var(--card); padding:25px; border:1px solid var(--primary); border-radius:15px; z-index:10001; box-shadow: 0 0 50px rgba(0,0,0,0.8);">
-        <h3 id="editor-title" style="margin-top:0; color:var(--primary);">Chỉnh sửa</h3>
-        <div id="editor-fields"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px;">
-            <button class="btn btn-green" onclick="adminSaveData()">LƯU</button>
-            <button class="btn btn-blue" onclick="closeAdminEditor()">ĐÓNG</button>
-        </div>
-        <button class="btn" style="background:var(--danger); color:white; margin-top:10px;" onclick="adminDeleteRow()">XÓA DỮ LIỆU</button>
-    </div>
-
-    <script>
-        let base64Image = ""; let isCameraOn = false; let currentEmployeeName = "Vô danh tiểu tốt";
-        const loading = document.getElementById('loading');
-
-        function openTab(id, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).style.display = 'block';
-            btn.classList.add('active');
-            if(id === 'history-tab') loadHistory();
-            if(id === 'admin-tab') loadAdminData();
-        }
-
-        async function toggleCamera() {
-            const area = document.getElementById('camera-area');
-            if(!isCameraOn) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                    area.innerHTML = `<video id="v" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>`;
-                    document.getElementById('v').srcObject = stream;
-                    window.currentStream = stream; isCameraOn = true;
-                } catch(e) { alert("Không thể mở Camera. Vui lòng cấp quyền!"); }
-            } else {
-                const v = document.getElementById('v');
-                const c = document.createElement('canvas');
-                c.width = v.videoWidth; c.height = v.videoHeight;
-                c.getContext('2d').drawImage(v,0,0);
-                base64Image = c.toDataURL("image/jpeg", 0.7);
-                area.innerHTML = `<img src="${base64Image}" style="width:100%; height:100%; object-fit:cover;">`;
-                window.currentStream.getTracks().forEach(t => t.stop()); isCameraOn = false;
-            }
-        }
-
-        function lookupEmployee() {
-            const id = document.getElementById('user-nvId').value.trim();
-            const d = document.getElementById('display-nv-name');
-            if(id.length >= 3) {
-                google.script.run.withSuccessHandler(n => {
-                    currentEmployeeName = n;
-                    d.innerText = "👤 " + n;
-                    d.style.color = n === "Vô danh tiểu tốt" ? "var(--danger)" : "var(--success)";
-                }).getEmployeeName(id);
-            } else { d.innerText = ""; currentEmployeeName = "Vô danh tiểu tốt"; }
-        }
-
-        function userSubmit(a) {
-            const nvId = document.getElementById('user-nvId').value.trim();
-            const tbId = document.getElementById('user-tbId').value.trim();
-            if(!nvId || !tbId || !base64Image) return alert("Vui lòng nhập đủ Mã NV, Mã TB và CHỤP ẢNH!");
-            
-            loading.style.display='flex';
-            const data = { nvId, nvName: currentEmployeeName, tbId, tinhTrang: document.getElementById('user-tinhTrang').value, hinhDong: a, hinhAnh: base64Image, hanhDong: a };
-            
-            google.script.run.withSuccessHandler(res => {
-                loading.style.display='none';
-                alert(res);
-                location.reload(); 
-            }).submitLog(data);
-        }
-
-        // LOGIC ADMIN
-        let currentAdminData = [];
-        function loadAdminData() {
-            const s = document.getElementById('admin-sheet-select').value;
-            google.script.run.withSuccessHandler(d => {
-                currentAdminData = d;
-                let h = '<table><tr><th>ID</th><th>TÊN / MÔ TẢ</th></tr>';
-                d.slice(1).forEach((r, i) => h += `<tr onclick="openAdminEditor(${i})"><td><b>${r[0]}</b></td><td>${r[1]}</td></tr>`);
-                document.getElementById('admin-table-area').innerHTML = h + '</table>';
-            }).getData(s);
-        }
-
-        function openAdminEditor(i) {
-            const f = document.getElementById('editor-fields'); f.innerHTML = "";
-            const headers = currentAdminData[0];
-            const row = i === -1 ? ["",""] : currentAdminData[i+1];
-            headers.forEach((h, j) => {
-                const dis = (j===0 && i!==-1) ? "readonly style='opacity:0.5'" : "";
-                f.innerHTML += `<label>${h}</label><input type="text" id="ed-${j}" value="${row[j]}" ${dis}>`;
-            });
-            document.getElementById('admin-editor').style.display='block';
-        }
-
-        function adminSaveData() {
-            const s = document.getElementById('admin-sheet-select').value;
-            const r = [document.getElementById('ed-0').value, document.getElementById('ed-1').value];
-            if(!r[0]) return alert("Mã ID không được để trống!");
-            loading.style.display='flex';
-            google.script.run.withSuccessHandler(res => { loading.style.display='none'; alert(res); closeAdminEditor(); loadAdminData(); }).adminUpdateRow(s, r);
-        }
-
-        function adminDeleteRow() {
-            const s = document.getElementById('admin-sheet-select').value;
-            const id = document.getElementById('ed-0').value;
-            if(confirm("Bạn chắc chắn muốn XÓA " + id + "?")) {
-                loading.style.display='flex';
-                google.script.run.withSuccessHandler(res => { loading.style.display='none'; alert(res); closeAdminEditor(); loadAdminData(); }).deleteDataRow(s, id);
-            }
-        }
-
-        function loadHistory() {
-            google.script.run.withSuccessHandler(d => {
-                if(d.length === 0) { document.getElementById('history-list').innerHTML = "Chưa có dữ liệu."; return; }
-                let h = '<table><tr><th>LÚC</th><th>TB</th><th>H.ĐỘNG</th></tr>';
-                d.forEach(i => h += `<tr><td style="color:#94a3b8">${i.time}</td><td><b>${i.tb}</b><br><small>${i.nv}</small></td><td style="color:${i.action==='NHẬN'?'var(--success)':'var(--warning)'}; font-weight:bold;">${i.action}</td></tr>`);
-                document.getElementById('history-list').innerHTML = h + '</table>';
-            }).getHistory();
-        }
-
-        function closeAdminEditor() { document.getElementById('admin-editor').style.display='none'; }
-    </script>
-</body>
-</html>
+// Sửa lại hàm Load lịch sử cho GitHub
+async function loadHistory() {
+    const data = await callAPI({ action: 'getHistory' });
+    let html = '<table>';
+    data.forEach(i => html += `<tr><td>${i.time}</td><td>${i.tb}</td><td>${i.action}</td></tr>`);
+    document.getElementById('history-list').innerHTML = html + '</table>';
+}
