@@ -1,211 +1,169 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMT SOC IT REPORT</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { background-color: #0b1120; color: white; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; margin: 0; }
-        .app-container { width: 100%; max-width: 400px; background: #161f32; padding: 20px; border-radius: 12px; border: 1px solid #2d3748; }
-        h2 { text-align: center; font-size: 18px; color: #cbd5e0; margin-top: 0; }
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #2d3748; padding-bottom: 10px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: #2d3748; color: #a0aec0; cursor: pointer; border-radius: 4px; font-size: 12px; }
+        body { background-color: #0b1120; color: white; font-family: sans-serif; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 450px; background: #161f32; padding: 20px; border-radius: 12px; border: 1px solid #2d3748; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #2d3748; color: #a0aec0; cursor: pointer; border-radius: 6px; font-size: 12px; }
         .tab-btn.active { background: #3182ce; color: white; font-weight: bold; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
         label { display: block; font-size: 11px; color: #a0aec0; margin: 15px 0 5px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; background: #0b1120; border: 1px solid #4a5568; color: white; border-radius: 6px; box-sizing: border-box; }
-        input:focus { border-color: #3182ce; outline: none; }
-        .input-group { display: flex; gap: 5px; align-items: center; }
-        .btn-scan-small { background: #2d3748; color: #3182ce; border: 1px solid #4a5568; padding: 12px; border-radius: 6px; cursor: pointer; }
-        #camera-area { width: 100%; height: 200px; background: #000; margin: 15px 0; border-radius: 8px; border: 1px solid #4a5568; display: flex; align-items: center; justify-content: center; overflow: hidden;}
-        #qr-reader { width: 100%; display: none; margin-top: 10px; }
-        .footer-btns { display: flex; gap: 10px; margin-top: 25px; }
-        .btn { padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; flex: 1; }
-        .btn-blue { background: #3182ce; color: white; width: 100%; }
+        input, select { width: 100%; padding: 12px; background: #0b1120; border: 1px solid #4a5568; color: white; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
+        #camera-area { width: 100%; height: 200px; background: #000; border-radius: 8px; border: 1px solid #4a5568; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 15px 0; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-blue { background: #3182ce; color: white; }
         .btn-green { background: #38a169; color: white; }
         .btn-orange { background: #d69e2e; color: white; }
-        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 9999; justify-content: center; align-items: center; font-weight: bold; }
+        #loading { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
     <div id="loading">Đang xử lý...</div>
     <div class="app-container">
-        <h2>BMT SOC IT REPORT</h2>
         <div class="tabs">
-            <button class="tab-btn active" onclick="openTab('user-tab', this)">BÁO CÁO (USER)</button>
+            <button class="tab-btn active" onclick="openTab('user-tab', this)">BÁO CÁO</button>
             <? if (isAdmin) { ?>
-                <button class="tab-btn" onclick="openTab('admin-tab', this)">ADMIN (CHỈ BẠN)</button>
+                <button class="tab-btn" onclick="openTab('history-tab', this)">LỊCH SỬ</button>
+                <button class="tab-btn" onclick="openTab('admin-tab', this)">ADMIN</button>
             <? } ?>
         </div>
 
-        <div id="user-tab" class="tab-content active">
-            <div id="qr-reader"></div>
-
+        <div id="user-tab" class="tab-content" style="display:block;">
             <label>MÃ NHÂN VIÊN</label>
-            <div class="input-group">
-                <input type="text" id="user-nvId" placeholder="Nhập hoặc quét mã...">
-                <button class="btn-scan-small" onclick="startQRScan('user-nvId')">SCAN</button>
-            </div>
+            <input type="text" id="user-nvId" placeholder="Nhập mã..." oninput="lookupEmployee()">
+            <div id="display-nv-name" style="font-size: 13px; font-weight: bold; margin-bottom: 10px;"></div>
 
             <label>MÃ THIẾT BỊ</label>
-            <div class="input-group">
-                <input type="text" id="user-tbId" placeholder="Nhập hoặc quét thiết bị...">
-                <button class="btn-scan-small" onclick="startQRScan('user-tbId')">SCAN</button>
-            </div>
+            <input type="text" id="user-tbId" placeholder="Nhập mã thiết bị...">
 
             <label>TÌNH TRẠNG</label>
-            <select id="user-tinhTrang">
-                <option value="Tốt">Hoạt động tốt</option>
-                <option value="Lỗi/Hỏng">Lỗi/Hỏng</option>
-            </select>
+            <select id="user-tinhTrang"><option>Tốt</option><option>Lỗi/Hỏng</option></select>
 
             <div id="camera-area">Camera chưa bật</div>
-            <button class="btn btn-blue" onclick="toggleCamera()">CHỤP ẢNH</button>
-
-            <div class="footer-btns">
+            <button class="btn btn-blue" onclick="toggleCamera()">📷 CHỤP ẢNH</button>
+            
+            <div style="display:flex; gap:10px;">
                 <button class="btn btn-green" onclick="userSubmit('NHẬN')">NHẬN</button>
                 <button class="btn btn-orange" onclick="userSubmit('TRẢ')">TRẢ</button>
             </div>
-            <div style="font-size:10px; color:#a0aec0; text-align:center; margin-top:15px;">Đang đăng nhập: <?= userEmail ?></div>
         </div>
 
         <? if (isAdmin) { ?>
+        <div id="history-tab" class="tab-content">
+            <div id="history-list">Đang tải...</div>
+            <button class="btn btn-blue" onclick="loadHistory()">🔄 LÀM MỚI</button>
+        </div>
+
         <div id="admin-tab" class="tab-content">
-            <label>CHỌN BẢNG DỮ LIỆU ĐỂ SỬA</label>
             <select id="admin-sheet-select" onchange="loadAdminData()">
-                <option value="Admin_NhanVien">Danh sách Nhân viên</option>
-                <option value="Admin_ThietBi">Danh sách Thiết bị</option>
+                <option value="Admin_NhanVien">Nhân viên</option>
+                <option value="Admin_ThietBi">Thiết bị</option>
             </select>
-            <button class="btn btn-blue" style="margin-top:10px;" onclick="openAdminEditor()">+ Thêm Dòng Mới</button>
-            
-            <div id="admin-table-area" style="width: 100%; overflow-x: auto; margin-top: 15px; font-size: 12px;">Đang tải dữ liệu...</div>
-            
-            <div id="admin-editor" style="display:none; margin-top:20px; border-top: 1px solid #2d3748; padding-top:10px;">
-                <h3 style="font-size:14px; text-align:center;">Thêm/Sửa Dữ Liệu</h3>
-                <div id="editor-fields"></div>
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button class="btn btn-green" style="flex:2" onclick="adminSaveData()">LƯU</button>
-                    <button class="btn btn-scan-small" style="flex:1" onclick="closeAdminEditor()">HỦY</button>
-                </div>
-            </div>
+            <button class="btn btn-blue" onclick="openAdminEditor(-1)">+ THÊM MỚI</button>
+            <div id="admin-table-area" style="margin-top:15px;"></div>
         </div>
         <? } ?>
     </div>
 
-    <script>
-        // --- CHUYỂN TAB ---
-        function openTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            btn.classList.add('active');
-            stopCamera(); // Tắt camera khi chuyển tab
-            if(tabId === 'admin-tab') loadAdminData();
-        }
+    <div id="admin-editor" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:80%; background:#161f32; padding:20px; border:2px solid #3182ce; border-radius:12px; z-index:11000;">
+        <div id="editor-fields"></div>
+        <button class="btn btn-green" onclick="adminSaveData()">LƯU</button>
+        <button class="btn btn-orange" onclick="adminDeleteRow()" style="background:#e53e3e">XÓA</button>
+        <button class="btn btn-blue" onclick="closeAdminEditor()">ĐÓNG</button>
+    </div>
 
-        // --- CAMERA TRÊN LAPTOP ---
-        let base64Image = ""; 
-        let isCameraOn = false;
+    <script>
+        let base64Image = ""; let isCameraOn = false; let currentEmployeeName = "Vô danh tiểu tốt";
+
+        function openTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).style.display = 'block';
+            btn.classList.add('active');
+            if(id === 'history-tab') loadHistory();
+            if(id === 'admin-tab') loadAdminData();
+        }
 
         async function toggleCamera() {
-            const cameraArea = document.getElementById('camera-area');
-            if(isCameraOn) {
-                // Chụp ảnh và tắt camera
-                const video = cameraArea.querySelector('video');
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                
-                // Nén ảnh sang base64
-                base64Image = canvas.toDataURL("image/jpeg", 0.8);
-                
-                // Hiển thị ảnh xem trước
-                cameraArea.innerHTML = `<img src="${base64Image}" style="width:100%; height:100%; object-fit:contain">`;
-                stopCamera();
+            const area = document.getElementById('camera-area');
+            if(!isCameraOn) {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                area.innerHTML = `<video id="v" autoplay style="width:100%; height:100%; object-fit:cover;"></video>`;
+                document.getElementById('v').srcObject = stream;
+                window.s = stream; isCameraOn = true;
             } else {
-                // Mở camera
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                    cameraArea.innerHTML = ""; 
-                    const video = document.createElement('video');
-                    video.srcObject = stream;
-                    video.autoplay = true;
-                    video.style.width = "100%";
-                    video.style.height = "100%";
-                    video.style.objectFit = "cover";
-                    cameraArea.appendChild(video);
-                    window.currentStream = stream;
-                    isCameraOn = true;
-                } catch (err) {
-                    alert("Không thể truy cập Camera. Hãy cấp quyền cho trình duyệt.");
-                }
+                const v = document.getElementById('v');
+                const c = document.createElement('canvas');
+                c.width = v.videoWidth; c.height = v.videoHeight;
+                c.getContext('2d').drawImage(v,0,0);
+                base64Image = c.toDataURL("image/jpeg", 0.7);
+                area.innerHTML = `<img src="${base64Image}" style="width:100%;">`;
+                window.s.getTracks().forEach(t => t.stop()); isCameraOn = false;
             }
         }
 
-        function stopCamera() {
-            if (window.currentStream) {
-                window.currentStream.getTracks().forEach(track => track.stop());
-                isCameraOn = false;
+        function lookupEmployee() {
+            const id = document.getElementById('user-nvId').value;
+            if(id.length > 2) {
+                google.script.run.withSuccessHandler(n => {
+                    currentEmployeeName = n;
+                    const d = document.getElementById('display-nv-name');
+                    d.innerText = "👤 " + n;
+                    d.style.color = n === "Vô danh tiểu tốt" ? "#e53e3e" : "#38a169";
+                }).getEmployeeName(id);
             }
         }
 
-        // --- QUÉT QR (Mở camera sau trên điện thoại) ---
-        let html5QrCode;
-        function startQRScan(targetId) {
-            document.getElementById('qr-reader').style.display = 'block';
-            if(html5QrCode) html5QrCode.clear();
-            html5QrCode = new Html5Qrcode("qr-reader");
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-                (decodedText) => {
-                    document.getElementById(targetId).value = decodedText;
-                    html5QrCode.stop();
-                    document.getElementById('qr-reader').style.display = 'none';
-                }
-            );
+        function userSubmit(a) {
+            const data = { nvId: document.getElementById('user-nvId').value, nvName: currentEmployeeName, tbId: document.getElementById('user-tbId').value, tinhTrang: document.getElementById('user-tinhTrang').value, hinhAnh: base64Image, hanhDong: a };
+            if(!data.nvId || !data.tbId || !base64Image) return alert("Thiếu thông tin hoặc chưa chụp ảnh!");
+            document.getElementById('loading').style.display='flex';
+            google.script.run.withSuccessHandler(r => { alert(r); location.reload(); }).submitLog(data);
         }
 
-        // --- USER SUBMIT ---
-        function userSubmit(action) {
-            const data = {
-                nvId: document.getElementById('user-nvId').value,
-                tbId: document.getElementById('user-tbId').value,
-                tinhTrang: document.getElementById('user-tinhTrang').value,
-                hinhAnh: base64Image,
-                hanhDong: action
-            };
-            if (!data.nvId || !data.tbId || !base64Image) { alert("Vui lòng nhập đủ Mã NV, Mã TB và CHỤP ẢNH!"); return; }
-            showLoading(true);
-            google.script.run.withSuccessHandler(r => { showLoading(false); alert(r); }).submitLog(data);
-        }
-
-        // --- ADMIN LOGIC (Chỉ chạy nếu là Admin) ---
-        <? if (isAdmin) { ?>
+        // --- ADMIN LOGIC ---
+        let adminData = [];
         function loadAdminData() {
-            const sheet = document.getElementById('admin-sheet-select').value;
-            google.script.run.withSuccessHandler(renderAdminTable).getData(sheet);
+            const s = document.getElementById('admin-sheet-select').value;
+            google.script.run.withSuccessHandler(d => {
+                adminData = d;
+                let h = '<table style="width:100%; font-size:12px;">';
+                d.slice(1).forEach((r, i) => h += `<tr onclick="openAdminEditor(${i})" style="border-bottom:1px solid #2d3748; height:40px;"><td>${r[0]}</td><td>${r[1]}</td></tr>`);
+                document.getElementById('admin-table-area').innerHTML = h + '</table>';
+            }).getData(s);
         }
-        function renderAdminTable(data) {
-            const tableArea = document.getElementById('admin-table-area');
-            if (!data || data.length === 0) { tableArea.innerHTML = "Bảng trống."; return; }
-            let html = '<table border="1" style="width:100%; border-collapse:collapse; color:white"><thead><tr>';
-            const sheet = document.getElementById('admin-sheet-select').value;
-            const headers = sheet === 'Admin_NhanVien' ? ['Mã NV', 'Tên NV'] : ['Mã TB', 'Tên TB'];
-            headers.forEach(h => html += `<th>${h}</th>`);
-            html += '</tr></thead><tbody>';
-            data.forEach((row, i) => {
-                html += `<tr onclick="openAdminEditor(${i})" style="cursor:pointer;"><td>${row[0]}</td><td>${row[1]}</td></tr>`;
-            });
-            html += '</tbody></table>';
-            tableArea.innerHTML = html;
-            window.currentAdminData = data;
-        }
-        // ... (Logic Editor Admin tương tự như các phiên bản trước) ...
-        <? } ?>
 
-        function showLoading(s) { document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
+        function openAdminEditor(i) {
+            const f = document.getElementById('editor-fields'); f.innerHTML = "";
+            const row = i === -1 ? ["",""] : adminData[i+1];
+            adminData[0].forEach((h, j) => f.innerHTML += `<label>${h}</label><input type="text" id="ed-${j}" value="${row[j]}">`);
+            document.getElementById('admin-editor').style.display='block';
+        }
+
+        function adminSaveData() {
+            const s = document.getElementById('admin-sheet-select').value;
+            const r = [document.getElementById('ed-0').value, document.getElementById('ed-1').value];
+            google.script.run.withSuccessHandler(res => { alert(res); closeAdminEditor(); loadAdminData(); }).adminUpdateRow(s, r);
+        }
+
+        function adminDeleteRow() {
+            const s = document.getElementById('admin-sheet-select').value;
+            const id = document.getElementById('ed-0').value;
+            if(confirm("Xóa " + id + "?")) google.script.run.withSuccessHandler(res => { closeAdminEditor(); loadAdminData(); }).deleteDataRow(s, id);
+        }
+
+        function loadHistory() {
+            google.script.run.withSuccessHandler(d => {
+                let h = '<table style="width:100%; font-size:11px;">';
+                d.forEach(i => h += `<tr><td>${i.time}</td><td>${i.tb}</td><td style="color:${i.action==='NHẬN'?'#38a169':'#d69e2e'}">${i.action}</td></tr>`);
+                document.getElementById('history-list').innerHTML = h + '</table>';
+            }).getHistory();
+        }
+
+        function closeAdminEditor() { document.getElementById('admin-editor').style.display='none'; }
     </script>
 </body>
 </html>
