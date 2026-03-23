@@ -1,28 +1,36 @@
-// THAY LINK WEB APP CỦA BẠN VÀO ĐÂY
-const API_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbyDZ4MMWygVMwf_yuhCor-K9_CIALWt4IJxPyDNfQupSxjHR2NB-4OgVHdpWH604O8o/exec"; //
+// 1. DÁN LINK WEB APP CỦA BẠN VÀO ĐÂY (Link có đuôi /exec)
+const API_URL = "https://script.google.com/a/macros/spxexpress.com/s/AKfycbyDZ4MMWygVMwf_yuhCor-K9_CIALWt4IJxPyDNfQupSxjHR2NB-4OgVHdpWH604O8o/exec"; 
 
-// Hàm gọi API chung cho GitHub
-async function callAPI(params, isPost = false) {
-    const options = isPost ? { method: 'POST', body: JSON.stringify(params) } : { method: 'GET' };
-    const url = isPost ? API_URL : API_URL + "?" + new URLSearchParams(params);
+// 2. Hàm gọi dữ liệu dùng chung (Vượt rào cản CORS)
+async function callGoogle(params) {
+    const url = API_URL + "?" + new URLSearchParams(params);
+    // Dùng mode: 'no-cors' hoặc fetch thông thường qua URLSearchParams
     const res = await fetch(url);
     return await res.json();
 }
 
-// Sửa lại hàm tra cứu tên trên GitHub
+// 3. Hàm tra cứu tên nhân viên
 async function lookupEmployee() {
     const id = document.getElementById('user-nvId').value.trim();
     if(id.length >= 3) {
-        const name = await callAPI({ action: 'getName', id: id });
+        const name = await callGoogle({ action: 'getName', id: id });
         currentEmployeeName = name;
-        document.getElementById('display-nv-name').innerText = "👤 " + name;
+        const d = document.getElementById('display-nv-name');
+        d.innerText = "👤 " + name;
+        d.style.color = name === "Vô danh tiểu tốt" ? "#e53e3e" : "#38a169";
     }
 }
 
-// Sửa lại hàm Load lịch sử cho GitHub
-async function loadHistory() {
-    const data = await callAPI({ action: 'getHistory' });
-    let html = '<table>';
-    data.forEach(i => html += `<tr><td>${i.time}</td><td>${i.tb}</td><td>${i.action}</td></tr>`);
-    document.getElementById('history-list').innerHTML = html + '</table>';
+// 4. Hàm gửi báo cáo Nhận/Trả
+async function userSubmit(action) {
+    const nvId = document.getElementById('user-nvId').value.trim();
+    const tbId = document.getElementById('user-tbId').value.trim();
+    if(!nvId || !tbId || !base64Image) return alert("Thiếu thông tin hoặc ảnh!");
+
+    const data = { nvId, nvName: currentEmployeeName, tbId, tinhTrang: document.getElementById('user-tinhTrang').value, hanhDong: action, hinhAnh: base64Image };
+    
+    // Gửi qua phương thức GET (để tránh lỗi POST trên GitHub)
+    const res = await callGoogle({ action: 'submit', data: JSON.stringify(data) });
+    alert(res);
+    location.reload();
 }
